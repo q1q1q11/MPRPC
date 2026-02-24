@@ -1,7 +1,9 @@
 # MPRPC
 c++实现的基于muduo网络库与protobuf编写的分布式网络通信框架
+
 一、技术栈
 Linux 网络编程，基于Muduo 网络库的Reactor高并发模型开发，Protobuf 数据序列化与反序列化，RPC 原理实现（Stub、Service、Channel、Controller 机制），Zookeeper 服务注册与发现机制，基于 Zookeeper 的分布式节点会话管理（Session），多线程编程与线程安全设计，异步日志系统，CMake 构建系统，Git 版本管理
+
 二、编译方式：
 运行脚本autobuild.sh:
 cd build
@@ -9,6 +11,7 @@ rm -rf *
 cmake ..
 make
 三、项目相关细节
+
 1.在proto文件中定义message类（google protobuf提供）的请求体与响应体还有rpc的service服务类，借助protoc工具直接生成对应的pb.cc,pb.h代码，也就是对应的c++请求消息类和响应消息类还有服务类（这些类都公共继承了对应的message类和service类，可使用其方法）。通过类对象的的serializetostring方法序列化对象为字符串，parsefromstring反序列化（序列化和反序列化都是在rpc框架中实现，业务代码无需关注）。
 2.option cc_generic_services=true表示生成service服务类与rpc方法描述。默认情况下不生成。
 3.proto生成对应的stub类是提供给调用方使用的。生成的userService_stub类的构造函数需要传入一个Rpc Channel* channel指针。该类方法的实现都直接依赖于底层的channel->method方法（我们要重写这个method方法构造我们的请求4字节header_size+servicename+methodname+args_size+args并且通过socket编程connect(),send()完成网络发送与接收recv()），负责rpc请求参数序列化以及网络发送还有zk服务查询以及等待响应反序列化response。构造stub(new mprpcchannel())对象以及request后，stub.方法(xx,&request,&response,xx)即可发送rpc请求。
