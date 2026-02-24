@@ -2,14 +2,17 @@
 c++实现的基于muduo网络库与protobuf编写的分布式网络通信框架
 
 一、技术栈
+
 Linux 网络编程，基于Muduo 网络库的Reactor高并发模型开发，Protobuf 数据序列化与反序列化，RPC 原理实现（Stub、Service、Channel、Controller 机制），Zookeeper 服务注册与发现机制，基于 Zookeeper 的分布式节点会话管理（Session），多线程编程与线程安全设计，异步日志系统，CMake 构建系统，Git 版本管理
 
 二、编译方式：
+
 运行脚本autobuild.sh:
 cd build
 rm -rf *
 cmake ..
 make
+
 三、项目相关细节
 
 1.在proto文件中定义message类（google protobuf提供）的请求体与响应体还有rpc的service服务类，借助protoc工具直接生成对应的pb.cc,pb.h代码，也就是对应的c++请求消息类和响应消息类还有服务类（这些类都公共继承了对应的message类和service类，可使用其方法）。通过类对象的的serializetostring方法序列化对象为字符串，parsefromstring反序列化（序列化和反序列化都是在rpc框架中实现，业务代码无需关注）。
